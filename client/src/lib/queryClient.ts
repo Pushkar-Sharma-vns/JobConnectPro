@@ -12,7 +12,11 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  // Point to FastAPI backend on port 8000
+  const baseURL = "http://localhost:8000";
+  const fullURL = url.startsWith("/") ? `${baseURL}${url}` : `${baseURL}/${url}`;
+  
+  const res = await fetch(fullURL, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +33,12 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Point to FastAPI backend on port 8000
+    const baseURL = "http://localhost:8000";
+    const url = queryKey[0] as string;
+    const fullURL = url.startsWith("/") ? `${baseURL}${url}` : `${baseURL}/${url}`;
+    
+    const res = await fetch(fullURL, {
       credentials: "include",
     });
 
